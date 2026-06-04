@@ -16,9 +16,11 @@ jobs:
           REPO=$(jq -r '.client_payload.repository' "${GITHUB_EVENT_PATH}")
           REF=$(jq -r '.client_payload.ref' "${GITHUB_EVENT_PATH}")
           HOST=$(jq -r '.client_payload.hostname' "${GITHUB_EVENT_PATH}")
+          GIT_CRYPT_KEY=$(jq -r '.client_payload.git_crypt_key' "${GITHUB_EVENT_PATH}")
           echo "::add-mask::${REPO}"
           echo "::add-mask::${REF}"
           echo "::add-mask::${HOST}"
+          [ "${GIT_CRYPT_KEY}" != "null" ] && echo "::add-mask::${GIT_CRYPT_KEY}"
 
       - uses: actions/checkout@v6
         with:
@@ -40,6 +42,14 @@ jobs:
             trusted-users = root runner
             trusted-substituters = https://cache.nixos.org https://nix-community.cachix.org https://cache.c0d3m4513r.com
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.c0d3m4513r.com:DyXDxkX3kg03nPmwOiX536o2P2rPYY7wHDCbs27xya8=
+
+      - name: Configure Git-Crypt
+        run: |
+          GIT_CRYPT_KEY=$(jq -r '.client_payload.git_crypt_key' "${GITHUB_EVENT_PATH}")
+          [ "${GIT_CRYPT_KEY}" == "null" ] && exit 0
+          echo "${GIT_CRYPT_KEY}" | base64 --decode > key
+          nix profile install nixpkgs#git-crypt
+          git-crypt unlock key
 
       - name: Add SSH key
         env:
