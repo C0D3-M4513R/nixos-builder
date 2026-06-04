@@ -11,6 +11,11 @@ jobs:
       fail-fast: true
 
     steps:
+      - name: Add mask
+        run: |
+          echo "::add-mask::${{github.event.client_payload.repository}}"
+          echo "::add-mask::${{github.event.client_payload.ref}}"
+          echo "::add-mask::${{github.event.client_payload.hostname}}"
 
       - uses: actions/checkout@v6
         with:
@@ -48,7 +53,7 @@ jobs:
             ssh-add /home/runner/.ssh/github_actions
 
 
-      - name: "Build ${{ matrix.config_name }} NixOS config ❄️"
+      - name: "Build NixOS config ❄️"
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
