@@ -33,7 +33,7 @@ jobs:
         with:
           hatchet-protocol: 'cleave' # holster, carve, cleave (default), rampage
 
-      - name: "Install Nix ❄️"
+      - name: "Install Nix"
         uses: cachix/install-nix-action@v31.8.4
         with:
           extra_nix_config: |
@@ -67,9 +67,12 @@ jobs:
             ssh-add /home/runner/.ssh/github_actions
 
 
-      - name: "Build NixOS config ❄️"
+      - name: "Build NixOS config"
+        run: |
+          nix build .#nixosConfigurations.${{ github.event.client_payload.hostname }}.config.system.build.toplevel --print-build-logs --no-update-lock-file
+
+      - name: "Push NixOS config to cache"
         env:
             SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          nix build .#nixosConfigurations.${{ github.event.client_payload.hostname }}.config.system.build.toplevel
-          nix copy --to ssh://cache.c0d3m4513r.com .#nixosConfigurations.${{ github.event.client_payload.hostname }}.config.system.build.toplevel
+          nix copy --to ssh://cache.c0d3m4513r.com .#nixosConfigurations.${{ github.event.client_payload.hostname }}.config.system.build.toplevel --print-build-logs --no-update-lock-file
