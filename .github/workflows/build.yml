@@ -20,7 +20,10 @@ jobs:
           echo "::add-mask::${REPO}"
           echo "::add-mask::${REF}"
           echo "::add-mask::${HOST}"
-          [ "${GIT_CRYPT_KEY}" != "null" ] && echo "::add-mask::${GIT_CRYPT_KEY}"
+          if [ "${GIT_CRYPT_KEY}" != "null" ]
+          then
+            echo "::add-mask::${GIT_CRYPT_KEY}"
+          fi
 
       - uses: actions/checkout@v6
         with:
@@ -46,7 +49,11 @@ jobs:
       - name: Configure Git-Crypt
         run: |
           GIT_CRYPT_KEY=$(jq -r '.client_payload.git_crypt_key' "${GITHUB_EVENT_PATH}")
-          [ "${GIT_CRYPT_KEY}" == "null" ] && exit 0
+          if [ "${GIT_CRYPT_KEY}" == "null" ]
+          then
+            exit 0
+          fi
+
           nix profile add nixpkgs#git-crypt
           echo "${GIT_CRYPT_KEY}" | base64 --decode > key
           git-crypt unlock key
