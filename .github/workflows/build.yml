@@ -49,15 +49,13 @@ jobs:
       - name: Configure Git-Crypt
         run: |
           GIT_CRYPT_KEY=$(jq -r '.client_payload.git_crypt_key' "${GITHUB_EVENT_PATH}")
-          if [ "${GIT_CRYPT_KEY}" == "null" ]
+          if [ "${GIT_CRYPT_KEY}" != "null" ]
           then
-            exit 0
+            nix profile add nixpkgs#git-crypt
+            echo "${GIT_CRYPT_KEY}" | base64 --decode > key
+            git-crypt unlock key
+            unlink key
           fi
-
-          nix profile add nixpkgs#git-crypt
-          echo "${GIT_CRYPT_KEY}" | base64 --decode > key
-          git-crypt unlock key
-          unlink key
 
       - name: Add SSH key
         env:
