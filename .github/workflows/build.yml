@@ -13,9 +13,12 @@ jobs:
     steps:
       - name: Add mask
         run: |
-          echo "::add-mask::${{github.event.client_payload.repository}}"
-          echo "::add-mask::${{github.event.client_payload.ref}}"
-          echo "::add-mask::${{github.event.client_payload.hostname}}"
+          REPO=$(jq -r '.client_payload.repository' "${GITHUB_EVENT_PATH}")
+          REF=$(jq -r '.client_payload.ref' "${GITHUB_EVENT_PATH}")
+          HOST=$(jq -r '.client_payload.hostname' "${GITHUB_EVENT_PATH}")
+          echo "::add-mask::${REPO}"
+          echo "::add-mask::${REF}"
+          echo "::add-mask::${HOST}"
 
       - uses: actions/checkout@v6
         with:
