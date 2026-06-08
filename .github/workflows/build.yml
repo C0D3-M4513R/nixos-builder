@@ -37,7 +37,7 @@ jobs:
           hatchet-protocol: 'cleave' # holster, carve, cleave (default), rampage
 
       - name: "Install Nix"
-        uses: cachix/install-nix-action@v31.8.4
+        uses: cachix/install-nix-action@v31.10.6
         with:
           extra_nix_config: |
             accept-flake-config = true
