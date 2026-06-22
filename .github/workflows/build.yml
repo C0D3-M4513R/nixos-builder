@@ -29,7 +29,7 @@ jobs:
         with:
           repository: ${{ github.event.client_payload.repository }}
           ref: ${{ github.event.client_payload.ref }}
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PRIVATE_REPOS_ACCESS_PAT }}
 
       - name: "Free disk space for Nix"
         uses: wimpysworld/nothing-but-nix@v10
@@ -45,6 +45,7 @@ jobs:
             trusted-users = root runner
             trusted-substituters = https://cache.nixos.org https://nix-community.cachix.org https://cache.c0d3m4513r.com
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.c0d3m4513r.com:DyXDxkX3kg03nPmwOiX536o2P2rPYY7wHDCbs27xya8=
+            access-tokens = github.com=${{ secrets.PRIVATE_REPOS_ACCESS_PAT }}
 
       - name: Configure Git-Crypt
         run: |
